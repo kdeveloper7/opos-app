@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro</title>
+  <script defer>
+    async function register(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Registrado con éxito');
+        window.location.href = 'login.html';
+      } else {
+        alert(data.message);
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+  <h1 class="text-2xl mb-4">Registro</h1>
+  <form onsubmit="register(event)" class="space-y-4">
+    <input type="text" id="username" placeholder="Usuario" class="border p-2 w-full"><br>
+    <input type="password" id="password" placeholder="Contraseña" class="border p-2 w-full"><br>
+    <button class="bg-green-500 text-white px-4 py-2">Registrarse</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Temas</title>
+  <script defer>
+    async function cargarTemas() {
+      const res = await fetch('http://localhost:3000/api/temas', {
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+      });
+      const temas = await res.json();
+      const container = document.getElementById('temas');
+      temas.forEach(t => {
+        const div = document.createElement('div');
+        div.classList = 'border p-2 my-2';
+        div.innerHTML = `<h3 class="text-xl font-bold">${t.titulo}</h3><p>${t.contenido}</p>`;
+        container.appendChild(div);
+      });
+    }
+    window.onload = cargarTemas;
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+  <h1 class="text-2xl mb-4">Tus Temas</h1>
+  <a href="crear-tema.html" class="text-blue-500 underline">Crear nuevo tema</a> |
+  <a href="feedback.html" class="text-blue-500 underline">Enviar feedback</a>
+  <div id="temas" class="mt-4"></div>
+</body>
+</html>

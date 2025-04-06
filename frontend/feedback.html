@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback</title>
+  <script defer>
+    async function enviar(event) {
+      event.preventDefault();
+      const temaId = document.getElementById('temaId').value;
+      const comentario = document.getElementById('comentario').value;
+      const res = await fetch('http://localhost:3000/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({ temaId, comentario })
+      });
+      if (res.ok) {
+        alert('Feedback enviado');
+        window.location.href = 'dashboard.html';
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+  <h1 class="text-2xl mb-4">Enviar Feedback</h1>
+  <form onsubmit="enviar(event)" class="space-y-4">
+    <input type="number" id="temaId" placeholder="ID del tema" class="border p-2 w-full"><br>
+    <textarea id="comentario" placeholder="Comentario" class="border p-2 w-full h-40"></textarea><br>
+    <button class="bg-purple-500 text-white px-4 py-2">Enviar</button>
+  </form>
+</body>
+</html>

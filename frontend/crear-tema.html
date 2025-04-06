@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Crear Tema</title>
+  <script defer>
+    async function crear(event) {
+      event.preventDefault();
+      const titulo = document.getElementById('titulo').value;
+      const contenido = document.getElementById('contenido').value;
+      const res = await fetch('http://localhost:3000/api/tema', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({ titulo, contenido })
+      });
+      if (res.ok) {
+        alert('Tema creado');
+        window.location.href = 'dashboard.html';
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+  <h1 class="text-2xl mb-4">Crear Tema</h1>
+  <form onsubmit="crear(event)" class="space-y-4">
+    <input type="text" id="titulo" placeholder="Título" class="border p-2 w-full"><br>
+    <textarea id="contenido" placeholder="Contenido" class="border p-2 w-full h-40"></textarea><br>
+    <button class="bg-blue-500 text-white px-4 py-2">Guardar</button>
+  </form>
+</body>
+</html>
