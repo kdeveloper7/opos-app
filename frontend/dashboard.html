@@ -2,29 +2,73 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Temas</title>
+  <title>Dashboard de Temas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script defer>
     async function cargarTemas() {
       const res = await fetch('http://localhost:3000/api/temas', {
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
       });
+
+      if (!res.ok) {
+        alert("Error al cargar los temas.");
+        return;
+      }
+
       const temas = await res.json();
       const container = document.getElementById('temas');
+      container.innerHTML = '';
+
+      if (temas.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">Aún no has creado temas.</p>';
+        return;
+      }
+
       temas.forEach(t => {
         const div = document.createElement('div');
-        div.classList = 'border p-2 my-2';
-        div.innerHTML = `<h3 class="text-xl font-bold">${t.titulo}</h3><p>${t.contenido}</p>`;
+        div.classList = 'border rounded p-4 my-4 shadow bg-white';
+        div.innerHTML = `
+          <h3 class="text-xl font-semibold mb-2 text-gray-800">${t.titulo}</h3>
+          <p class="text-gray-700 mb-3">${t.contenido}</p>
+          <div class="flex gap-3 flex-wrap">
+            <a href="editar-tema.html?id=${t.id}" class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded">Editar</a>
+            <button onclick="eliminarTema(${t.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded">Eliminar</button>
+          </div>
+        `;
         container.appendChild(div);
       });
     }
+
+    async function eliminarTema(id) {
+      if (!confirm("¿Estás seguro de que deseas eliminar este tema?")) return;
+
+      const res = await fetch(`http://localhost:3000/api/tema/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      });
+
+      if (res.ok) {
+        alert('Tema eliminado correctamente.');
+        cargarTemas();
+      } else {
+        alert('Error al eliminar el tema.');
+      }
+    }
+
     window.onload = cargarTemas;
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-4">
-  <h1 class="text-2xl mb-4">Tus Temas</h1>
-  <a href="crear-tema.html" class="text-blue-500 underline">Crear nuevo tema</a> |
-  <a href="feedback.html" class="text-blue-500 underline">Enviar feedback</a>
-  <div id="temas" class="mt-4"></div>
+<body class="min-h-screen bg-gray-100 p-6 font-sans">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Tus Temas</h1>
+    <div class="mb-6 space-x-4">
+      <a href="crear-tema.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Crear nuevo tema</a>
+      <a href="feedback.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Enviar feedback</a>
+      <a href="ver-feedbacks.html" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">Ver Feedbacks</a>
+    </div>
+    <div id="temas"></div>
+  </div>
 </body>
 </html>
