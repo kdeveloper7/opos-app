@@ -1,96 +1,137 @@
-# Plataforma de Oposiciones - Full Stack App
+# Oposiciones App
 
-## Tecnologías
+Este proyecto es una aplicación para gestionar temas y feedbacks relacionados con oposiciones. Permite a los usuarios autenticarse, crear temas, enviar feedbacks y visualizar los feedbacks asociados a cada tema.
 
-- **Backend:** Node.js, Express, MySQL
-- **Frontend:** HTML + Tailwind CSS
-- **Base de datos:** MySQL
-- **Autenticación:** JWT
+## Funcionalidades principales
+
+- **Autenticación de usuarios**: Inicio de sesión y registro.
+- **Gestión de temas**: Crear, editar y eliminar temas.
+- **Enviar feedbacks**: Los usuarios pueden enviar feedbacks relacionados con un tema.
+- **Ver feedbacks**: Nueva funcionalidad que permite seleccionar un tema desde un desplegable y visualizar los feedbacks asociados.
 
 ---
 
-## 📦 Instalación
+## Mejoras recientes
 
-### 1. Clonar el repositorio o descomprimir el ZIP
+1. **Nueva interfaz para ver feedbacks**:
+   - Se agregó una página (`ver-feedbacks.html`) que permite seleccionar un tema desde un desplegable y visualizar los feedbacks asociados.
+   - Se eliminó el botón "Ver Feedbacks" de cada tema en el dashboard para centralizar esta funcionalidad en una única página.
 
-```bash
-unzip oposiciones_project.zip
-cd backend
-```
+2. **Correcciones en el backend**:
+   - Se corrigieron las rutas y controladores para manejar correctamente las solicitudes de feedbacks por tema.
+   - Se verificó la conexión con la base de datos para asegurar que los datos se obtienen correctamente.
 
-### 2. Instalar dependencias del backend
+---
 
-```bash
-npm install
-```
+## Requisitos previos
 
-### 3. Configurar variables de entorno
+- **Node.js**: Versión 16 o superior.
+- **Base de datos MySQL**: Configurada y en ejecución.
+- **NPM**: Administrador de paquetes de Node.js.
 
-Crear un archivo `.env` en la carpeta `backend/` con el siguiente contenido (ya viene incluido):
+---
 
-```
+## Configuración del proyecto
+
+1. **Clonar el repositorio**:
+   ```bash
+   git clone <URL-del-repositorio>
+   cd opos-app
+
+2. Instalar dependencias:
+   npm install
+3. Configurar las variables de entorno: Crea un archivo .env en la carpeta backend con el siguiente contenido:
+
 PORT=3000
 DB_HOST=localhost
-DB_USER=root
-DB_PASS=1234
-DB_NAME=oposiciones
-JWT_SECRET=supersecreto
-```
+DB_USER=tu_usuario
+DB_PASS=tu_contraseña
+DB_NAME=nombre_de_la_base_de_datos
+JWT_SECRET=tu_secreto_jwt
 
-### 4. Crear base de datos MySQL
+4. Inicializar la base de datos: Ejecuta el script SQL para crear las tablas necesarias y poblar datos iniciales
 
-Accede a tu consola MySQL y ejecuta:
-
-```sql
-CREATE DATABASE oposiciones;
-
-USE oposiciones;
-
-CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(100) UNIQUE,
-  password VARCHAR(255)
+CREATE TABLE `users` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(100) UNIQUE,
+  `password` VARCHAR(255),
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE temas (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  titulo VARCHAR(255),
-  contenido TEXT,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+CREATE TABLE `temas` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT,
+  `titulo` VARCHAR(255),
+  `contenido` TEXT,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE feedback (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  tema_id INT,
-  comentario TEXT,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (tema_id) REFERENCES temas(id)
+CREATE TABLE `feedback` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT,
+  `tema_id` INT,
+  `comentario` TEXT,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+  FOREIGN KEY (`tema_id`) REFERENCES `temas`(`id`)
 );
-```
 
----
+6. Iniciar el servidor backend:
 
-## 🚀 Levantar el servidor
-
-```bash
+cd backend
 npm start
-```
 
-El servidor estará corriendo en: [http://localhost:3000](http://localhost:3000)
+6. 
+Abrir el frontend: Abre el archivo index.html en tu navegador o utiliza una extensión como "Live Server" en VS Code.
 
----
+Uso de la aplicación
+Inicio de sesión:
 
-## 🌐 Frontend
+Accede a login.html para iniciar sesión con tus credenciales.
+Dashboard:
 
-Abre el archivo `frontend/index.html` en tu navegador. Los demás archivos se comunican con el backend usando `fetch()`.
+Desde el dashboard (dashboard.html), puedes:
+Crear nuevos temas.
+Editar o eliminar temas existentes.
+Enviar feedbacks relacionados con un tema.
+Ver feedbacks seleccionando un tema desde un desplegable en la página ver-feedbacks.html.
+Ver feedbacks:
 
----
+Accede a ver-feedbacks.html.
+Selecciona un tema desde el desplegable y haz clic en "Ver Feedbacks" para visualizar los comentarios asociados.
 
-## 🧠 Funcionalidades
+Estructura del proyecto
+opos-app/
+├── backend/
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── feedbackController.js
+│   │   └── temaController.js
+│   ├── models/
+│   │   ├── db.js
+│   │   ├── Feedback.js
+│   │   └── Tema.js
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── feedbackRoutes.js
+│   │   └── temaRoutes.js
+│   ├── app.js
+│   └── .env
+├── frontend/
+│   ├── index.html
+│   ├── login.html
+│   ├── dashboard.html
+│   ├── feedback.html
+│   ├── [ver-feedbacks.html](http://_vscodecontentref_/1)
+│   └── css/
+└── [README.md](http://_vscodecontentref_/2)
 
-- Registro y login de usuarios
-- Creación y visualización de temas
-- Envío de feedback por tema
-- Protección de rutas con tokens JWT
+Próximas mejoras
+Implementar paginación para los feedbacks.
+Agregar validaciones más robustas en el frontend y backend.
+Mejorar el diseño de la interfaz con TailwindCSS.
+
+Contribuciones
+Si deseas contribuir a este proyecto, por favor abre un issue o envía un pull request. ¡Toda ayuda es bienvenida!
+
