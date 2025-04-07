@@ -2,23 +2,72 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inicio</title>
-  <script defer>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <!-- Logotipo -->
+      <a href="index.html" class="flex items-center space-x-2">
+        <img src="./assets/logo.png" alt="Águila Plateada" class="w-10 h-10">
+        <span class="text-xl font-bold text-gray-800">Oposiciones App</span>
+      </a>
+
+      <!-- Menú de usuario -->
+      <div class="relative">
+        <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
+          <img src="./assets/user.png" alt="Usuario" class="w-10 h-10 rounded-full border border-gray-300">
+        </button>
+        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-md">
+          <a href="dashboard.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Dashboard</a>
+          <button onclick="logout()" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="flex-grow container mx-auto px-4 py-8 text-center">
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">Bienvenido a Oposiciones App</h1>
+    <p class="text-lg text-gray-600 mb-8">Gestiona tus temas, envía feedbacks y mejora tu preparación.</p>
+    <a href="dashboard.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700">Ir a tus temas</a>
+  </main>
+
+  <div id="loader" class="hidden fixed inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50 rounded-sm">
+    <img src="./assets/logo.png" alt="Cargando..." class="w-20 h-20 animate-spin">
+  </div>
+  
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2025 Oposiciones App. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Redirigir al login si no hay token
+    window.onload = () => {
+      const token = localStorage.getItem('token');
+      if (!token) window.location.href = 'login.html';
+
+      // Mostrar/ocultar menú de usuario
+      const userMenuButton = document.getElementById('userMenuButton');
+      const userMenu = document.getElementById('userMenu');
+      userMenuButton.addEventListener('click', () => {
+        userMenu.classList.toggle('hidden');
+      });
+    };
+
+    // Función para cerrar sesión
     function logout() {
       localStorage.removeItem('token');
       window.location.href = 'login.html';
     }
-
-    window.onload = () => {
-      const token = localStorage.getItem('token');
-      if (!token) window.location.href = 'login.html';
-    }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="p-4">
-  <h1 class="text-2xl mb-4">Bienvenido</h1>
-  <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 mb-4">Cerrar sesión</button><br>
-  <a href="dashboard.html" class="text-blue-500 underline">Ir a tus temas</a>
 </body>
 </html>

@@ -2,35 +2,74 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <script defer>
-    async function login(event) {
-      event.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const res = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem('token', data.token);
-        window.location.href = 'index.html';  // redirigir al índice
-      } else {
-        alert(data.message);
-      }
-    }
-  </script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-4">
-  <h1 class="text-2xl mb-4">Login</h1>
-  <form onsubmit="login(event)" class="space-y-4">
-    <input type="text" id="username" placeholder="Usuario" class="border p-2 w-full"><br>
-    <input type="password" id="password" placeholder="Contraseña" class="border p-2 w-full"><br>
-    <button class="bg-blue-500 text-white px-4 py-2">Entrar</button>
-  </form>
-  <p class="mt-4">¿No tienes cuenta? <a href="register.html" class="text-blue-600 underline">Regístrate aquí</a></p>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-96">
+    <h2 class="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
+        <input type="text" id="username" name="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+        <input type="password" id="password" name="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Iniciar Sesión</button>
+    </form>
+    <p id="errorMessage" class="text-red-500 text-sm mt-4 hidden"></p>
+    <p class="text-center mt-4 text-sm">
+      ¿No tienes una cuenta? <a href="register.html" class="text-blue-500 hover:underline">Regístrate aquí</a>
+    </p>
+    <div class="text-center mt-4">
+      <a href="#" onclick="entrarComoInvitado()" class="text-blue-500 hover:underline">Entrar como invitado</a>
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', data.token); // Guardar el token en localStorage
+          window.location.href = 'index.html'; // Redirigir al index.html
+        } else {
+          errorMessage.textContent = data.message || 'Error al iniciar sesión';
+          errorMessage.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorMessage.textContent = 'Error de conexión con el servidor';
+        errorMessage.classList.remove('hidden');
+      }
+    });
+
+    function entrarComoInvitado() {
+      // Generar un token temporal para el usuario invitado
+      const invitadoToken = 'guest-token-' + Date.now(); // Token temporal
+      localStorage.setItem('token', invitadoToken);
+
+      // Redirigir al dashboard
+      window.location.href = 'index.html';
+    }
+  </script>
 </body>
 </html>

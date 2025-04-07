@@ -3,7 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <title>Ver Feedbacks</title>
-  <script defer>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md fixed top-0 left-0 w-full z-10">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <!-- Logotipo -->
+      <a href="index.html" class="flex items-center space-x-2">
+        <img src="./assets/logo.png" alt="Águila Plateada" class="w-10 h-10">
+        <span class="text-xl font-bold text-gray-800">Oposiciones App</span>
+      </a>
+
+      <!-- Menú de usuario -->
+      <div class="relative">
+        <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
+          <img src="./assets/user.png" alt="Usuario" class="w-10 h-10 rounded-full border border-gray-300">
+        </button>
+        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-md">
+          <a href="dashboard.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Dashboard</a>
+          <button onclick="logout()" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="mt-20 container mx-auto px-4">
+    <h1 class="text-2xl mb-4">Ver Feedbacks</h1>
+    <div class="mb-4">
+      <label for="temaId" class="block mb-1 font-medium text-gray-700">Selecciona un tema</label>
+      <select id="temaId" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400" required>
+        <option value="" disabled selected>-- Selecciona un tema --</option>
+      </select>
+      <button onclick="verFeedbacks()" class="bg-blue-500 text-white px-4 py-2 mt-2">Ver Feedbacks</button>
+    </div>
+    <div id="feedbacksContainer" class="space-y-4"></div>
+    <a href="dashboard.html" class="text-blue-600 underline">Volver al Dashboard</a>
+  </main>
+
+  <script>
     async function cargarTemas() {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -13,13 +53,14 @@
       }
 
       const res = await fetch('http://localhost:3000/api/temas', {
-        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        headers: { 'Authorization': 'Bearer ' + token }
       });
 
       if (!res.ok) {
         alert('Error al cargar los temas.');
         return;
       }
+
       const temas = await res.json();
       const select = document.getElementById('temaId');
       temas.forEach(t => {
@@ -35,9 +76,7 @@
       const token = localStorage.getItem('token');
 
       const res = await fetch(`http://localhost:3000/api/tema/${temaId}/feedbacks`, {
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
+        headers: { 'Authorization': 'Bearer ' + token }
       });
 
       if (!res.ok) {
@@ -59,20 +98,20 @@
       `).join('');
     }
 
-    document.addEventListener('DOMContentLoaded', cargarTemas);
+    window.onload = () => {
+      cargarTemas();
+
+      const userMenuButton = document.getElementById('userMenuButton');
+      const userMenu = document.getElementById('userMenu');
+      userMenuButton.addEventListener('click', () => {
+        userMenu.classList.toggle('hidden');
+      });
+    };
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="p-4">
-  <h1 class="text-2xl mb-4">Ver Feedbacks</h1>
-  <div class="mb-4">
-    <label for="temaId" class="block mb-1 font-medium text-gray-700">Selecciona un tema</label>
-    <select id="temaId" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400" required>
-      <option value="" disabled selected>-- Selecciona un tema --</option>
-    </select>
-    <button onclick="verFeedbacks()" class="bg-blue-500 text-white px-4 py-2 mt-2">Ver Feedbacks</button>
-  </div>
-  <div id="feedbacksContainer" class="space-y-4"></div>
-  <a href="dashboard.html" class="text-blue-600 underline">Volver al Dashboard</a>
 </body>
 </html>

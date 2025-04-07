@@ -4,39 +4,90 @@
   <meta charset="UTF-8">
   <title>Dashboard de Temas</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script defer>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Loader -->
+  <div id="loader" class="hidden fixed inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50">
+    <img src="./assets/logo.png" alt="Cargando..." class="w-20 h-20 animate-spin">
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white shadow-md fixed top-0 left-0 w-full z-10">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <!-- Logotipo -->
+      <a href="index.html" class="flex items-center space-x-2">
+        <img src="./assets/logo.png" alt="Águila Plateada" class="w-10 h-10">
+        <span class="text-xl font-bold text-gray-800">Oposiciones App</span>
+      </a>
+
+      <!-- Menú de usuario -->
+      <div class="relative">
+        <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
+          <img src="./assets/user.png" alt="Usuario" class="w-10 h-10 rounded-full border border-gray-300">
+        </button>
+        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-md">
+          <a href="dashboard.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Dashboard</a>
+          <button onclick="logout()" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- Contenido principal -->
+  <main class="mt-20 max-w-4xl mx-auto px-4">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Tus Temas</h1>
+    <div class="overflow-x-auto flex gap-4 mb-6 sm:flex-wrap sm:overflow-visible">
+      <a href="crear-tema.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex-shrink-0 w-48 text-center">Crear nuevo tema</a>
+      <a href="feedback.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex-shrink-0 w-48 text-center">Enviar feedback</a>
+      <a href="ver-feedbacks.html" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded flex-shrink-0 w-48 text-center">Ver Feedbacks</a>
+    </div>
+    <section id="temas"></section>
+  </main>
+  <script>
     async function cargarTemas() {
-      const res = await fetch('http://localhost:3000/api/temas', {
-        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-      });
+      const loader = document.getElementById('loader');
+      loader.classList.remove('hidden'); // Mostrar el loader
 
-      if (!res.ok) {
-        alert("Error al cargar los temas.");
-        return;
+      try {
+        const res = await fetch('http://localhost:3000/api/temas', {
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
+        if (!res.ok) {
+          alert("Error al cargar los temas.");
+          return;
+        }
+
+        const temas = await res.json();
+        const container = document.getElementById('temas');
+        container.innerHTML = '';
+
+        if (temas.length === 0) {
+          container.innerHTML = '<p class="text-gray-500">Aún no has creado temas.</p>';
+          return;
+        }
+
+        temas.forEach(t => {
+          const div = document.createElement('div');
+          div.classList = 'border rounded p-4 my-4 shadow bg-white';
+          div.innerHTML = `
+            <h3 class="text-xl font-semibold mb-2 text-gray-800">${t.titulo}</h3>
+            <p class="text-gray-700 mb-3">${t.contenido}</p>
+            <div class="flex gap-3 flex-wrap">
+              <a href="editar-tema.html?id=${t.id}" class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded">Editar</a>
+              <button onclick="eliminarTema(${t.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded">Eliminar</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (error) {
+        console.error("Error al cargar los temas:", error);
+        alert("Ocurrió un error al cargar los temas.");
+      } finally {
+        loader.classList.add('hidden'); // Ocultar el loader
       }
-
-      const temas = await res.json();
-      const container = document.getElementById('temas');
-      container.innerHTML = '';
-
-      if (temas.length === 0) {
-        container.innerHTML = '<p class="text-gray-500">Aún no has creado temas.</p>';
-        return;
-      }
-
-      temas.forEach(t => {
-        const div = document.createElement('div');
-        div.classList = 'border rounded p-4 my-4 shadow bg-white';
-        div.innerHTML = `
-          <h3 class="text-xl font-semibold mb-2 text-gray-800">${t.titulo}</h3>
-          <p class="text-gray-700 mb-3">${t.contenido}</p>
-          <div class="flex gap-3 flex-wrap">
-            <a href="editar-tema.html?id=${t.id}" class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded">Editar</a>
-            <button onclick="eliminarTema(${t.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded">Eliminar</button>
-          </div>
-        `;
-        container.appendChild(div);
-      });
     }
 
     async function eliminarTema(id) {
@@ -57,18 +108,20 @@
       }
     }
 
-    window.onload = cargarTemas;
+    window.onload = () => {
+      cargarTemas();
+
+      const userMenuButton = document.getElementById('userMenuButton');
+      const userMenu = document.getElementById('userMenu');
+      userMenuButton.addEventListener('click', () => {
+        userMenu.classList.toggle('hidden');
+      });
+    };
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
   </script>
-</head>
-<body class="min-h-screen bg-gray-100 p-6 font-sans">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">Tus Temas</h1>
-    <div class="mb-6 space-x-4">
-      <a href="crear-tema.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Crear nuevo tema</a>
-      <a href="feedback.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Enviar feedback</a>
-      <a href="ver-feedbacks.html" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">Ver Feedbacks</a>
-    </div>
-    <div id="temas"></div>
-  </div>
 </body>
 </html>

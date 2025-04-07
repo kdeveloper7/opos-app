@@ -23,9 +23,10 @@ export async function updateTema(id, userId, titulo, contenido) {
 }
 
 export async function deleteTema(id, userId) {
-  const [result] = await pool.query(
-    'DELETE FROM temas WHERE id = ? AND user_id = ?',
-    [id, userId]
-  );
+  // Primero elimina los feedbacks asociados al tema
+  await pool.query('DELETE FROM feedback WHERE tema_id = ?', [id]);
+
+  // Luego elimina el tema
+  const [result] = await pool.query('DELETE FROM temas WHERE id = ? AND user_id = ?', [id, userId]);
   return result.affectedRows > 0;
 }
